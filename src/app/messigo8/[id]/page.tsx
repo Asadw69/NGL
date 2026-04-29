@@ -114,27 +114,58 @@ export default function MessageDetailPage() {
       </div>
 
       {/* Technical Data (Owner Only) */}
-      <div className="mt-8 w-full max-w-sm bg-white rounded-3xl p-6 shadow-sm border border-gray-100 space-y-4">
-        <h3 className="text-gray-400 font-black text-xs uppercase tracking-widest">Message Metadata</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <p className="text-[10px] text-gray-400 font-bold uppercase">Sender ID</p>
-            <p className="text-sm font-black truncate">{message.sender_token || 'Anonymous'}</p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-[10px] text-gray-400 font-bold uppercase">Location</p>
-            <p className="text-sm font-black">
-              {message.latitude ? `${message.latitude.toFixed(2)}, ${message.longitude.toFixed(2)}` : 'Not shared'}
-            </p>
+      <div className="mt-8 w-full max-w-sm bg-white rounded-3xl p-6 shadow-sm border border-gray-100 space-y-6">
+        <div>
+          <h3 className="text-gray-400 font-black text-xs uppercase tracking-widest mb-4">Sender Hints</h3>
+          <div className="flex flex-wrap gap-2">
+            {message.device && (
+              <div className="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full text-[11px] font-black flex items-center">
+                <span className="mr-1">{message.device.includes('iPhone') ? '📱' : '💻'}</span>
+                {message.device}
+              </div>
+            )}
+            {message.browser && (
+              <div className="bg-purple-50 text-purple-600 px-3 py-1.5 rounded-full text-[11px] font-black flex items-center">
+                <span className="mr-1">🌐</span>
+                {message.browser}
+              </div>
+            )}
+            {message.ip && (
+              <div className="bg-green-50 text-green-600 px-3 py-1.5 rounded-full text-[11px] font-black flex items-center">
+                <span className="mr-1">📍</span>
+                From your region
+              </div>
+            )}
+            <div className="bg-orange-50 text-orange-600 px-3 py-1.5 rounded-full text-[11px] font-black flex items-center">
+              <span className="mr-1">👀</span>
+              First time sender
+            </div>
           </div>
         </div>
+
+        <div className="pt-4 border-t border-gray-50">
+          <h3 className="text-gray-400 font-black text-[10px] uppercase tracking-widest mb-3">Raw Metadata</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <p className="text-[9px] text-gray-300 font-bold uppercase">Location</p>
+              <p className="text-xs font-black truncate">
+                {message.latitude ? `${message.latitude.toFixed(3)}, ${message.longitude.toFixed(3)}` : 'Not available'}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-[9px] text-gray-300 font-bold uppercase">Sender IP</p>
+              <p className="text-xs font-black truncate">{message.ip || 'Hidden'}</p>
+            </div>
+          </div>
+        </div>
+
         {message.latitude && (
           <a 
             href={`https://www.google.com/maps?q=${message.latitude},${message.longitude}`}
             target="_blank"
-            className="block w-full text-center py-2 bg-gray-50 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-100 transition-colors"
+            className="block w-full text-center py-3 bg-gray-50 rounded-2xl text-[11px] font-black text-gray-400 hover:bg-gray-100 transition-all active:scale-95"
           >
-            📍 View on Maps
+            📍 VIEW PRECISE LOCATION ON MAPS
           </a>
         )}
       </div>

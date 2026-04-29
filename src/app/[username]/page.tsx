@@ -47,22 +47,39 @@ export default function UserPublicPage() {
   const handleSubmit = async (message: string) => {
     setIsSubmitting(true);
     const sender_token = getSenderToken();
+    let currentCoords = coords;
+
+    // Secondary check: if we don't have coords yet, try one last quick request
+    if (!currentCoords && "geolocation" in navigator) {
+      try {
+        const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 });
+        });
+        currentCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      } catch (e) {
+        console.warn("Final location attempt failed:", e);
+      }
+    }
 
     try {
-      const { error } = await supabase
-        .from('messages')
-        .insert([
-          { 
-            content: message, 
-            sender_token, 
-            recipient_username: username,
-            latitude: coords?.lat || null,
-            longitude: coords?.lng || null
-          }
-        ]);
+      const response = await fetch('/api/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message,
+          sender_token,
+          recipient_username: username,
+          latitude: currentCoords?.lat || null,
+          longitude: currentCoords?.lng || null
+        })
+      });
 
-      if (error) {
-        console.error('Error sending message:', error);
+      const result = await response.json();
+
+      if (!response.ok) {
+        alert(result.error || 'Failed to send message');
+        setIsSubmitting(false);
+        return;
       }
       
       // Simulate network delay for better UX
@@ -73,7 +90,7 @@ export default function UserPublicPage() {
 
     } catch (err) {
       console.error('Submission error:', err);
-      setIsSent(true); // Fallback success for demo
+      alert('Network error. Please check your connection.');
       setIsSubmitting(false);
     }
   };
