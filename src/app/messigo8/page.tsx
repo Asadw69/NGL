@@ -14,7 +14,7 @@ export default function InboxPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const SECRET_PASSWORD = "admin"; // You can change this anytime
+  const SECRET_PASSWORD = "messigo8hai"; // You can change this anytime
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
