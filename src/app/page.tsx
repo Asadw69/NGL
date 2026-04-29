@@ -13,12 +13,6 @@ export default function LandingPage() {
       {/* Navbar */}
       <nav className="flex justify-between items-center px-6 py-6 max-w-5xl mx-auto">
         <h1 className="text-3xl font-black italic tracking-tighter text-black">NGL</h1>
-        <Link 
-          href="/messigo8" 
-          className="bg-black text-white px-5 py-2.5 rounded-full font-bold text-sm hover:scale-105 transition-transform"
-        >
-          My Inbox
-        </Link>
       </nav>
 
       {/* Hero Section */}
