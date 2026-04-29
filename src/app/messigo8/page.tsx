@@ -14,16 +14,28 @@ export default function InboxPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const SECRET_PASSWORD = "messigo8hai"; // You can change this anytime
-
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === SECRET_PASSWORD) {
-      setAuthorized(true);
-      fetchMessages();
-    } else {
-      setError('Wrong password');
-      setPassword('');
+    setError('');
+    
+    try {
+      const response = await fetch('/api/verify-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setAuthorized(true);
+        fetchMessages();
+      } else {
+        setError(result.error || 'Login failed');
+        setPassword('');
+      }
+    } catch (err) {
+      setError('Network error. Try again.');
     }
   };
 
