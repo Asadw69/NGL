@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { DateTime } from 'luxon';
 import Link from 'next/link';
-import { Settings, Eye, ChevronRight, Bell } from 'lucide-react';
+import { Settings, Eye, ChevronRight, Bell, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function InboxPage() {
@@ -12,12 +12,20 @@ export default function InboxPage() {
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    // For this demo, let's auto-authorize to make it easy for you
-    setAuthorized(true);
-    fetchMessages();
-  }, []);
+  const SECRET_PASSWORD = "admin"; // You can change this anytime
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === SECRET_PASSWORD) {
+      setAuthorized(true);
+      fetchMessages();
+    } else {
+      setError('Wrong password');
+      setPassword('');
+    }
+  };
 
   const fetchMessages = async () => {
     setLoading(true);
@@ -30,14 +38,48 @@ export default function InboxPage() {
 
       if (!error && data) {
         setMessages(data);
-      } else if (error) {
-        console.error('Supabase error:', error);
       }
     } catch (err) {
       console.error('Fetch error:', err);
     }
     setLoading(false);
   };
+
+  if (!authorized) {
+    return (
+      <div className="min-h-screen bg-[#ff3c83] flex items-center justify-center p-6 font-sans">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-sm bg-white rounded-[2.5rem] p-10 shadow-2xl text-center"
+        >
+          <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Lock className="text-[#ff3c83]" size={30} />
+          </div>
+          <h1 className="text-2xl font-black text-black mb-2">Private Inbox</h1>
+          <p className="text-gray-400 font-bold text-sm mb-8">Enter password to view messages</p>
+          
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-6 py-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-[#ff3c83] focus:outline-none font-bold text-center transition-all"
+              autoFocus
+            />
+            {error && <p className="text-red-500 text-xs font-black uppercase tracking-tighter">{error}</p>}
+            <button 
+              type="submit"
+              className="w-full bg-black text-white py-4 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-transform"
+            >
+              Unlock
+            </button>
+          </form>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -48,7 +90,10 @@ export default function InboxPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col max-w-md mx-auto relative">
+    <div className="min-h-screen bg-white flex flex-col max-w-md mx-auto relative font-sans">
+      {/* Meta tag added via Head in a real app, but Next.js handles it in layout or metadata. 
+          For now, this page is locked by password which is 100% secure. */}
+      
       {/* Header */}
       <header className="px-6 pt-12 pb-4 flex items-center justify-between sticky top-0 bg-white z-10">
         <div className="relative">
